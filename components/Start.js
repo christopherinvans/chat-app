@@ -6,7 +6,8 @@ import {
     TextInput, 
     StyleSheet, 
     ImageBackground, 
-    TouchableOpacity 
+    TouchableOpacity,
+    KeyboardAvoidingView 
 } from 'react-native';
 
 const backgroundColors = {
@@ -108,7 +109,12 @@ export default class Start extends React.Component {
                                 Start Chatting
                             </Text>
                         </TouchableOpacity>
+                        {Platform.OS === "ios"?<KeyboardAvoidingView behavior="padding" />: null}
                   </View>
+                  {Platform.OS === "android" ? (
+            <KeyboardAvoidingView behavior="height" />
+          ) : null}
+          {Platform.OS === "ios"?<KeyboardAvoidingView behavior="padding" />: null}
                 </ImageBackground>
             </View>
         )
