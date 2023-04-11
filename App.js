@@ -38,9 +38,10 @@ const App = () => {
         />
         <Stack.Screen
           name="Chat"
-          component={Chat}
-          {props => <Chat db={db} {...props} />}
-        />
+          component={Chat}>
+            {/* pass db object to chat component */}
+            {props => <Chat db={db} {...props} />}
+            </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
