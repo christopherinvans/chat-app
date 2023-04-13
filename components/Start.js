@@ -9,6 +9,7 @@ import {
     TouchableOpacity,
     KeyboardAvoidingView 
 } from 'react-native';
+import { getAuth, signInAnonymously } from "firebase/auth";
 
 const backgroundColors = {
     black: { backgroundColor: '#000000'},
@@ -16,7 +17,18 @@ const backgroundColors = {
     purple: { backgroundColor: '#474056'},
     green: { backgroundColor: '#94ae89'}
 }
+const auth = getAuth();
 
+  const signInUser = () => {
+    signInAnonymously(auth)
+      .then(result => {
+        navigation.navigate("Chat", { userID: result.user.uid });
+        Alert.alert("Signed in Successfully!");
+      })
+      .catch((error) => {
+        Alert.alert("Unable to sign in, try later again.");
+      })
+  }
 export default class Start extends React.Component {
    
     constructor(props) {
@@ -24,6 +36,7 @@ export default class Start extends React.Component {
         this.state = { name: '', color: ''};
     }
     render () {
+      
         const { black, grey, purple, green} = backgroundColors;
         return (
             <View style={styles.container}>
@@ -96,15 +109,17 @@ export default class Start extends React.Component {
                       </View>
                       <TouchableOpacity
                         style={[styles.nameBox, styles.chatBox]}
-                       // title='Go to Chat'
-                        onPress={() => 
-                        this.props.navigation.navigate('Chat', 
-                        {
-                             name: this.state.name, 
-                             color: this.state.color
-                        })
-                        }
-                        >
+                        onPress={signInUser}>
+
+                       {/* // title='Go to Chat'
+                        {/* // onPress={() =>  */}
+                        {/* // this.props.navigation.navigate('Chat',  */}
+                        {/* // { */}
+                        {/* //      name: this.state.name,  */}
+                        {/* //      color: this.state.color */}
+                        {/* // }) */}
+                        {/* // } */}
+                        {/* // > */}
                             <Text style={[styles.colorSelector, styles.chatBoxText]} >
                                 Start Chatting
                             </Text>
