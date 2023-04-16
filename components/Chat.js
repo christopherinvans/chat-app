@@ -1,94 +1,87 @@
 import { useState, useEffect } from "react";
-import { StyleSheet, View, FlatList, Text, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, View, KeyboardAvoidingView, Platform } from "react-native";
 import { Bubble, GiftedChat } from "react-native-gifted-chat";
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBRMaVHRbyD2NpeXpbXJcFasNCiJLhD1QM",
-  authDomain: "chatapp-4fdcc.firebaseapp.com",
-  projectId: "chatapp-4fdcc",
-  storageBucket: "chatapp-4fdcc.appspot.com",
-  messagingSenderId: "274539179086",
-  appId: "1:274539179086:web:2ef388166f7679fab2a71f"
-};
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Initialize Cloud Firestore and get a reference to the service
-const db = getFirestore(app);
-
-const Chat = ({ route, navigation }) => {
-  const { name } = route.params;
+const Chat = () => {
+  const route = useRoute();
+  const { user, color } = route.params;
   const [messages, setMessages] = useState([]);
+  const navigation = useNavigation();
+
   const onSend = (newMessages) => {
-   setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages))
- }
+    setMessages((previousMessages) =>
+      GiftedChat.append(previousMessages, newMessages)
+    );
+  };
 
   useEffect(() => {
     setMessages([
       {
         _id: 1,
-        text: 'Hello developer',
+        text: "Hello developer",
         createdAt: new Date(),
         user: {
           _id: 2,
-          name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any',
+          name: "React Native",
+          avatar: "https://placeimg.com/140/140/any",
         },
-      },
-      {
-        _id: 2,
-        text: 'You have entered the chat',
-        createdAt: new Date(),
-        system: true,
       },
     ]);
   }, []);
 
-
   useEffect(() => {
-    navigation.setOptions({ title: name })
+    navigation.setOptions({ title: user.username });
   }, []);
 
   const renderBubble = (props) => {
-    return <Bubble
-      {...props}
-      wrapperStyle={{
-        right: {
-          backgroundColor: "#000"
-        },
-        left: {
-          backgroundColor: "#FFF"
-        }
-      }}
-    />
-  }
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          right: {
+            backgroundColor: "#3b3d3d",
+          },
+          left: {
+            backgroundColor: "#FFF",
+          },
+        }}
+      />
+    );
+  };
 
   return (
     <View
-        style={{
-          flex: 1,
-          // backgroundColor: color,
-        }}>
+      style={{
+        flex: 1,
+        backgroundColor: "#FFF",
+        marginBottom: 20,
+      }}
+    >
       <GiftedChat
+        messagesContainerStyle={{ backgroundColor: color }}
         messages={messages}
         renderBubble={renderBubble}
-        onSend={messages => onSend(messages)}
+        onSend={(messages) => onSend(messages)}
         user={{
-          _id: 1
+          _id: user.uid,
+          name: user.username,
+          avatar: `https://placehold.co/140x140?text=${user.username.charAt(
+            0
+          )}`,
         }}
       />
-      { Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null }
+      {Platform.OS === "android" ? (
+        <KeyboardAvoidingView behavior="height" />
+      ) : null}
     </View>
-  )
-
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
-  }
+    flex: 1,
+  },
 });
 
 export default Chat;
