@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect} from "react";
 import { StyleSheet, View, KeyboardAvoidingView, Platform } from "react-native";
 import { Bubble, GiftedChat } from "react-native-gifted-chat";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { query, collection } from "firebase/firestore";
+import { db } from "../firebase";
 
 const Chat = () => {
   const route = useRoute();
@@ -16,19 +18,23 @@ const Chat = () => {
   };
 
   useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        text: "Hello developer",
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: "React Native",
-          avatar: "https://placeimg.com/140/140/any",
-        },
-      },
-    ]);
-  }, []);
+    navigation.setOptions({ title: user });
+    const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+    const unsubMessages = onSnapshot(q, (docs) => {
+      let newMessages = [];
+      docs.forEach(doc => {
+        newMessages.push({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: new Date(doc.data().createdAt.toMillis())
+        })
+      })
+      setMessages(newMessages);
+    })
+    return () => {
+      if (unsubMessages) unsubMessages();
+    }
+   }, []);
 
   useEffect(() => {
     navigation.setOptions({ title: user.username });
