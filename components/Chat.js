@@ -1,8 +1,8 @@
-import { useState, useEffect} from "react";
+import React, { useState, useEffect} from "react";
 import { StyleSheet, View, KeyboardAvoidingView, Platform } from "react-native";
 import { Bubble, GiftedChat } from "react-native-gifted-chat";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { query, collection } from "firebase/firestore";
+import { query, collection, orderBy, onSnapshot, addDoc } from "firebase/firestore";
 import  db  from "../firebase";
 
 const Chat = () => {
@@ -12,10 +12,8 @@ const Chat = () => {
   const navigation = useNavigation();
 
   const onSend = (newMessages) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, newMessages)
-    );
-  };
+    addDoc(collection(db, "messages"), newMessages[0])
+  }
 
   useEffect(() => {
     navigation.setOptions({ title: user });
