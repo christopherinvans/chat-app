@@ -3,7 +3,7 @@ import { StyleSheet, View, KeyboardAvoidingView, Platform } from "react-native";
 import { Bubble, GiftedChat } from "react-native-gifted-chat";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { query, collection } from "firebase/firestore";
-import { db } from "../firebase";
+import  db  from "../firebase";
 
 const Chat = () => {
   const route = useRoute();
