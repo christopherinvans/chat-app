@@ -1,9 +1,20 @@
 import React, { useState, useEffect} from "react";
-import { StyleSheet, View, KeyboardAvoidingView, Platform } from "react-native";
+import { StyleSheet, View, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { Bubble, GiftedChat } from "react-native-gifted-chat";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { query, collection, orderBy, onSnapshot, addDoc } from "firebase/firestore";
+import { 
+  query, 
+  collection, 
+  orderBy, 
+  onSnapshot, 
+  addDoc, 
+  getFirestore, 
+  disableNetwork, 
+  enableNetwork 
+} from "firebase/firestore";
 import  db  from "../firebase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNetInfo }from '@react-native-community/netinfo';
 
 const Chat = () => {
   const route = useRoute();
