@@ -32,7 +32,7 @@ const Chat = ({ db, route, isConnected, navigation }) => {
 
     navigation.setOptions({ title: user });
     const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
-    const unsubMessages = onSnapshot(q, (docs) => {
+    unsubMessages = onSnapshot(q, (docs) => {
       let newMessages = [];
       docs.forEach(doc => {
         newMessages.push({
@@ -110,6 +110,7 @@ const Chat = ({ db, route, isConnected, navigation }) => {
         messagesContainerStyle={{ backgroundColor: color }}
         messages={messages}
         renderBubble={renderBubble}
+        renderInputToolbar={renderInputToolbar}
         onSend={(messages) => onSend(messages)}
         user={{
           _id: user.uid,
