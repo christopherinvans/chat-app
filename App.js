@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, LogBox, Alert } from 'react-native';
 // import the screens we want to navigate
@@ -6,6 +7,9 @@ import Chat from './components/Chat';
 // import react Navigation
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useNetInfo }from '@react-native-community/netinfo';
+import { getFirestore, disableNetwork, enableNetwork } from "firebase/firestore";
+import  db  from "./firebase";
 
 LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
 

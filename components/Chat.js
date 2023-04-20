@@ -1,7 +1,6 @@
 import React, { useState, useEffect} from "react";
 import { StyleSheet, View, KeyboardAvoidingView, Platform, Alert } from "react-native";
-import { Bubble, GiftedChat } from "react-native-gifted-chat";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { Bubble, GiftedChat, InputToolbar } from "react-native-gifted-chat";
 import { 
   query, 
   collection, 
@@ -12,21 +11,25 @@ import {
   disableNetwork, 
   enableNetwork 
 } from "firebase/firestore";
-import  db  from "../firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNetInfo }from '@react-native-community/netinfo';
 
-const Chat = () => {
-  const route = useRoute();
+let unsubMessages;
+
+const Chat = ({ db, route, isConnected, navigation }) => {
   const { user, color } = route.params;
   const [messages, setMessages] = useState([]);
-  const navigation = useNavigation();
 
   const onSend = (newMessages) => {
     addDoc(collection(db, "messages"), newMessages[0])
   }
 
   useEffect(() => {
+    if (isConnected === true) {
+      // unregister current onSnapshot() listener to avoid registering multiple listeners when
+      // useEffect code is re-executed.
+      if (unsubMessages) unsubMessages();
+      unsubMessages = null;
+
     navigation.setOptions({ title: user });
     const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
     const unsubMessages = onSnapshot(q, (docs) => {
@@ -38,16 +41,46 @@ const Chat = () => {
           createdAt: new Date(doc.data().createdAt.toMillis())
         })
       })
+      cacheMessages(newMessages);
       setMessages(newMessages);
-    })
+    });
+  } else {
+    loadCachedMessages();
+  }
     return () => {
       if (unsubMessages) unsubMessages();
     }
-   }, []);
+   }, [isConnected]);
+
+    // async function that sets messages with cached value
+  // || [] will assign an empty array to cachedMessages if the messages_stored item hasn’t been set yet in AsyncStorage
+  const loadCachedMessages = async () => {
+    const cachedMessages =
+      (await AsyncStorage.getItem('messages_stored')) || [];
+    setMessages(JSON.parse(cachedMessages));
+  };
+
+  // cashing data whenever it is updated
+  // try-catch function - to prevent the app from crashing in case AsyncStorage fails to store the data.
+  const cacheMessages = async (messagesToCache) => {
+    try {
+      await AsyncStorage.setItem(
+        'messages_stored',
+        JSON.stringify(messagesToCache)
+      );
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   useEffect(() => {
     navigation.setOptions({ title: user.username });
   }, []);
+  
+  const renderInputToolbar = (props) => {
+    if (isConnected) return <InputToolbar {...props} />;
+    else return null;
+   }
 
   const renderBubble = (props) => {
     return (
