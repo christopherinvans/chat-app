@@ -8,8 +8,8 @@ import Chat from './components/Chat';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useNetInfo }from '@react-native-community/netinfo';
-import { getFirestore, disableNetwork, enableNetwork } from "firebase/firestore";
-import  db  from "./firebase";
+import { disableNetwork, enableNetwork } from "firebase/firestore";
+import  db, { app } from "./firebase";
 import { getStorage } from "firebase/storage";
 
 LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);

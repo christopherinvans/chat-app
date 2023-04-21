@@ -6,8 +6,6 @@ import {
   SystemMessage,
   Day,
   InputToolbar,
-  Avatar,
-  ScrollView,
 } from 'react-native-gifted-chat';
 import { 
   query, 
@@ -15,9 +13,6 @@ import {
   orderBy, 
   onSnapshot, 
   addDoc, 
-  getFirestore, 
-  disableNetwork, 
-  enableNetwork 
 } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomActions from './CustomActions';
