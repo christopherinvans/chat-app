@@ -1,6 +1,14 @@
 import React, { useState, useEffect} from "react";
 import { StyleSheet, View, KeyboardAvoidingView, Platform, Alert } from "react-native";
-import { Bubble, GiftedChat, InputToolbar } from "react-native-gifted-chat";
+import {
+  GiftedChat,
+  Bubble,
+  SystemMessage,
+  Day,
+  InputToolbar,
+  Avatar,
+  ScrollView,
+} from 'react-native-gifted-chat';
 import { 
   query, 
   collection, 
@@ -13,12 +21,12 @@ import {
 } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomActions from './CustomActions';
+import MapView from 'react-native-maps';
 
-let unsubMessages;
-
-const Chat = ({ db, route, isConnected, navigation }) => {
+const Chat = ({ db, route, isConnected, navigation, storage }) => {
   const { user, color } = route.params;
   const [messages, setMessages] = useState([]);
+  let unsubMessages;
 
   const onSend = (newMessages) => {
     addDoc(collection(db, "messages"), newMessages[0])
@@ -53,6 +61,7 @@ const Chat = ({ db, route, isConnected, navigation }) => {
     }
    }, [isConnected]);
 
+
     // async function that sets messages with cached value
   // || [] will assign an empty array to cachedMessages if the messages_stored item hasn’t been set yet in AsyncStorage
   const loadCachedMessages = async () => {
@@ -61,7 +70,7 @@ const Chat = ({ db, route, isConnected, navigation }) => {
     setMessages(JSON.parse(cachedMessages));
   };
 
-  // cashing data whenever it is updated
+  // caching data whenever it is updated
   // try-catch function - to prevent the app from crashing in case AsyncStorage fails to store the data.
   const cacheMessages = async (messagesToCache) => {
     try {
@@ -99,9 +108,55 @@ const Chat = ({ db, route, isConnected, navigation }) => {
     );
   };
 
-  const renderCustomActions = (props) => {
-    return <CustomActions {...props} />;
+  const renderSystemMessage = (props) => {
+    return (
+      <SystemMessage
+        {...props}
+        textStyle={{ fontSize: 14, color: '#fff', fontWeight: 'bold' }}
+      />
+    );
   };
+
+  const renderDay = (props) => {
+    return (
+      <Day
+        {...props}
+        textStyle={{ fontSize: 14, color: '#fff', fontWeight: 'bold' }}
+      />
+    );
+  };
+
+ // renderCustomActions function is responsible for creating the circle button
+ const renderCustomActions = (props) => {
+  return (
+    <CustomActions
+      storage={storage}
+      userID={route.params.userID}
+      {...props}
+      color={color}
+    />
+  );
+};
+
+/**renderCustomView checks if the currentMessage contains location data.
+ * If true, returns a MapView*/
+const renderCustomView = (props) => {
+  const { currentMessage } = props;
+  if (currentMessage.location) {
+    return (
+      <MapView
+        style={{ width: 250, height: 200, borderRadius: 13, margin: 3 }}
+        region={{
+          latitude: currentMessage.location.latitude,
+          longitude: currentMessage.location.longitude,
+          latitudeDelta: 0.0922, // determine the size of the map
+          longitudeDelta: 0.0421, // determine the size of the map
+        }}
+      />
+    );
+  }
+  return null;
+};
 
   return (
     <View
@@ -117,6 +172,9 @@ const Chat = ({ db, route, isConnected, navigation }) => {
         renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
         renderActions={renderCustomActions}
+        renderCustomView={renderCustomView}
+        renderSystemMessage={renderSystemMessage}
+        renderDay={renderDay}
         onSend={(messages) => onSend(messages)}
         user={{
           _id: user.uid,
