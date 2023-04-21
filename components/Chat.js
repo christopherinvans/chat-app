@@ -12,6 +12,7 @@ import {
   enableNetwork 
 } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomActions from './CustomActions';
 
 let unsubMessages;
 
@@ -98,6 +99,10 @@ const Chat = ({ db, route, isConnected, navigation }) => {
     );
   };
 
+  const renderCustomActions = (props) => {
+    return <CustomActions {...props} />;
+  };
+
   return (
     <View
       style={{
@@ -111,6 +116,7 @@ const Chat = ({ db, route, isConnected, navigation }) => {
         messages={messages}
         renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
+        renderActions={renderCustomActions}
         onSend={(messages) => onSend(messages)}
         user={{
           _id: user.uid,
